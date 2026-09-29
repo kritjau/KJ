@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- KJ pilot emblem: chamfered frame (same cut corners as the site's panels), two rank chevrons, cyan status dot -->
+  <path d="M3 3H23L29 9V29H9L3 23Z" fill="#0E1013" stroke="#FF6A13" stroke-width="2"/>
+  <path d="M9 17L16 10L23 17" fill="none" stroke="#D7DCE1" stroke-width="2.5" stroke-linecap="square"/>
+  <path d="M9 23L16 16L23 23" fill="none" stroke="#FF6A13" stroke-width="2.5" stroke-linecap="square"/>
+  <rect x="6" y="6" width="3" height="3" fill="#5FD4E6"/>
+</svg>

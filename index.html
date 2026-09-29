@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<!-- Thai text: wrap it in lang="th", e.g. <span lang="th">สวัสดีครับ</span>, for correct screen-reader voice and spacing -->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0E1013">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Krit Jarupanitkul (KJ)">
+<meta property="og:description" content="Digital innovation and AI student at Rangsit University: home lab, computer vision and game projects.">
+<title>Krit Jarupanitkul (KJ)</title>
+<meta name="description" content="KJ, a student at Rangsit University, Thailand, focused on computer networking, systems administration and functional programming.">
+<link rel="icon" href="emblem.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<!-- start-up screen: once per visit, hides the page before first paint; the 5.5s timeout un-hides it even if script.js fails -->
+<script>
+try {
+  if (!sessionStorage.getItem('booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    sessionStorage.setItem('booted', '1');
+    document.documentElement.classList.add('initializing');
+    setTimeout(function () { document.documentElement.classList.remove('initializing'); }, 5500);
+  }
+} catch (e) {}
+</script>
+</head>
+<body>
+<a class="btn primary skip" href="#main">Skip to content</a>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+  <p class="code"><a class="callsign" href="#"><img class="emblem" src="emblem.svg" alt="" width="32" height="32">KJ<span class="vh">, back to top</span></a></p>
+  <nav aria-label="Main">
+    <ul role="list">
+      <li><a href="#about">About</a></li>
+      <li><a href="#record">Record</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#offduty">Hobbies</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ===== HERO: boot sequence ===== -->
+  <!-- --n = number of characters on the line, --d = start delay -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="boot">
+      <p class="boot-line" style="--n:13; --d:.1s">SYSTEM ONLINE</p>
+      <p class="boot-line" style="--n:12; --d:.35s">PILOT ID: KJ</p>
+      <p class="boot-line" style="--n:37; --d:.6s">STATUS: STUDENT // RANGSIT UNIVERSITY</p>
+    </div>
+    <h1 class="title" id="hero-title" data-delay="1100" data-speed="45">Krit Jarupanitkul</h1>
+    <div class="hero-rest">
+      <!-- EDIT: tagline and intro -->
+      <p class="tagline">Digital innovation and artificial intelligence student at Rangsit University.</p>
+      <p class="intro">I enjoy building things and learning new stuff.</p>
+      <div class="actions">
+        <a class="btn primary" href="#about">▶ Begin mission</a>
+        <a class="btn" href="#projects">View projects</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT: pilot profile ===== -->
+  <section id="about" class="sec" aria-labelledby="about-title">
+    <hgroup class="sec-head">
+      <p class="code">SEC-01 // About me</p>
+      <h2 id="about-title">Pilot profile</h2>
+    </hgroup>
+    <div class="tx">
+      <p class="from">KJ // Transmission</p>
+      <p class="msg">Thanks for stopping by. Here's who's in the cockpit.</p>
+    </div>
+
+    <article class="panel profile">
+      <img class="portrait" src="profile.webp" alt="Portrait of KJ" width="520" height="519" loading="lazy" decoding="async">
+      <!-- EDIT: profile fields -->
+      <div>
+        <dl class="sheet">
+          <dt>Name</dt><dd>Krit Jarupanitkul <span lang="th">(กฤษฏิ์ จารุพาณิชย์กุล)</span></dd>
+          <dt>Callsign</dt><dd>KJ</dd>
+          <dt>Affiliation</dt><dd>Rangsit University, Thailand</dd>
+          <dt>Specialization</dt><dd>Digital innovation and artificial intelligence</dd>
+          <dt>Focus</dt><dd>Computer networking, systems administration, functional programming</dd>
+          <dt>Languages</dt><dd>Thai, English</dd>
+          <dt>Interests</dt><dd>Anime, manga and manhwa, light novels, games, series</dd>
+        </dl>
+        <p class="bio">Never stop learning, never stop exploring, never stop building, and never stop dreaming.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===== SERVICE RECORD: education and experience ===== -->
+  <!-- EDIT: oldest first; copy an <li> block per entry -->
+  <section id="record" class="sec" aria-labelledby="record-title">
+    <hgroup class="sec-head">
+      <p class="code">SEC-02 // Education and experience</p>
+      <h2 id="record-title">Service record</h2>
+    </hgroup>
+    <div class="tx">
+      <p class="from">KJ // Transmission</p>
+      <p class="msg">Logged deployments so far.</p>
+    </div>
+    <ol class="record" role="list">
+      <li>
+        <p class="code">REC-01 // 2014–2020</p>
+        <h3>Saipanya Rangsit School</h3>
+        <p>Middle school and high school</p>
+      </li>
+      <li>
+        <p class="code">REC-02 // 2026–present</p>
+        <h3>Rangsit University</h3>
+        <p>Digital innovation and artificial intelligence</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ===== LOADOUT: skills ===== -->
+  <!-- EDIT: --lv (0–5), the "Rating" text to match, and the tags -->
+  <section id="skills" class="sec" aria-labelledby="skills-title">
+    <hgroup class="sec-head">
+      <p class="code">SEC-03 // Skills</p>
+      <h2 id="skills-title">Loadout</h2>
+    </hgroup>
+    <div class="tx">
+      <p class="from">KJ // Transmission</p>
+      <p class="msg">Current build. Still upgrading parts.</p>
+    </div>
+    <div class="grid loadout">
+      <article class="panel part">
+        <p class="slot">Head</p>
+        <h3>Networking</h3>
+        <p class="gauge" style="--lv:4">Rating 4 of 5</p>
+        <ul class="tags" role="list"><li>TCP/IP</li><li>Subnetting</li><li>DNS &amp; DHCP</li><li>VLANs</li><li>Firewalls</li></ul>
+      </article>
+      <article class="panel part">
+        <p class="slot">Core</p>
+        <h3>Systems / Linux</h3>
+        <p class="gauge" style="--lv:4">Rating 4 of 5</p>
+        <ul class="tags" role="list"><li>Linux CLI</li><li>SSH</li><li>systemd</li><li>Bash</li><li>Self-hosting</li><li>JVM tuning</li></ul>
+      </article>
+      <article class="panel part">
+        <p class="slot">Arms</p>
+        <h3>Programming</h3>
+        <p class="gauge" style="--lv:3">Rating 3 of 5</p>
+        <ul class="tags" role="list"><li>Functional programming</li><li>Python</li><li>C</li><li>HTML &amp; CSS</li><li>JavaScript</li></ul>
+      </article>
+      <article class="panel part">
+        <p class="slot">Legs</p>
+        <h3>Hardware / Electronics</h3>
+        <p class="gauge" style="--lv:3">Rating 3 of 5</p>
+        <ul class="tags" role="list"><li>Arduino</li><li>Raspberry Pi</li><li>Jetson Nano</li><li>ESP32</li></ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== MISSION ARCHIVE: projects ===== -->
+  <!-- EDIT: status (status done / status active / status secret), years, roles, descriptions, tags and links -->
+  <section id="projects" class="sec" aria-labelledby="projects-title">
+    <hgroup class="sec-head">
+      <p class="code">SEC-04 // Projects</p>
+      <h2 id="projects-title">Mission archive</h2>
+    </hgroup>
+    <div class="tx">
+      <p class="from">KJ // Transmission</p>
+      <p class="msg">Each file is something I built. Open one for details.</p>
+    </div>
+    <div class="grid">
+      <article class="panel mission">
+        <p class="status secret">Secret mission</p>
+        <h3>Mission 01 — Home lab</h3>
+        <p class="code">2022–present // Solo project</p>
+        <p>A home server that hosts modded Minecraft for friends, tuned for smooth performance under load.</p>
+        <ul class="tags" role="list"><li>Linux</li><li>Self-hosting</li><li>JVM tuning</li><li>Networking</li></ul>
+        <button class="btn sm restricted" type="button" popovertarget="m01-denied">Access denied<span class="vh">: Mission 01 details</span></button>
+        <div class="denied" id="m01-denied" popover role="dialog" aria-labelledby="m01-denied-title">
+          <p class="denied-code">Error 403 // Mission 01</p>
+          <p class="denied-title" id="m01-denied-title">Access denied</p>
+          <p>Your clearance level is too low to open this mission file. It's a private project with no public link.</p>
+          <button class="btn sm" type="button" popovertarget="m01-denied" popovertargetaction="hide">Close</button>
+        </div>
+      </article>
+      <article class="panel mission">
+        <p class="status done">Complete</p>
+        <h3>Mission 02 — Asteroids</h3>
+        <p class="code">2026 // Solo project</p>
+        <p>A retro-style space shooter game built for fun while learning game development concepts.</p>
+        <ul class="tags" role="list"><li>Python</li><li>Pygame</li><li>Game development</li></ul>
+        <a class="btn sm" href="https://github.com/kritjau/asteroids">View on GitHub<span class="vh">: Asteroids</span></a>
+      </article>
+      <article class="panel mission">
+        <p class="status active">In progress</p>
+        <h3>Mission 03 — Plate detection</h3>
+        <p class="code">2026 // Solo project</p>
+        <p>A computer vision project for detecting and recognizing license plates in real-time video feeds.</p>
+        <ul class="tags" role="list"><li>Python</li><li>OpenCV</li><li>ByteTrack</li><li>PaddleOCR</li></ul>
+        <a class="btn sm" href="https://github.com/kritjau/THAI_ALP">View on GitHub<span class="vh">: License plate detection</span></a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== OFF-DUTY LOG: hobbies ===== -->
+  <!-- EDIT: titles, one-line opinions, and image links (any size; shown 16:9, cropped to fit; a broken link shows "Signal lost") -->
+  <section id="offduty" class="sec" aria-labelledby="offduty-title">
+    <hgroup class="sec-head">
+      <p class="code">SEC-05 // Hobbies</p>
+      <h2 id="offduty-title">Off-duty log</h2>
+    </hgroup>
+    <div class="tx">
+      <p class="from">KJ // Transmission</p>
+      <p class="msg">What I'm into when I'm not in the lab.</p>
+    </div>
+    <div class="grid">
+      <article class="panel log"><p class="code">Anime</p><h3>Code Geass</h3><p>One of my favorite mecha series with a compelling story and great character development.</p>
+        <details class="view">
+          <summary class="btn sm"><span class="when-closed">View image</span><span class="when-open">Hide image</span><span class="vh">: Code Geass</span></summary>
+          <img src="https://miro.medium.com/0*dClIdBEEnQvqfFsv.jpg" alt="Code Geass cover art" width="640" height="360" loading="lazy">
+        </details>
+      </article>
+      <article class="panel log"><p class="code">Manga / manhwa</p><h3>Kingdom</h3><p>A gripping historical drama with intense battles and complex politics.</p>
+        <details class="view">
+          <summary class="btn sm"><span class="when-closed">View image</span><span class="when-open">Hide image</span><span class="vh">: Kingdom</span></summary>
+          <img src="https://a.storyblok.com/f/178900/1280x908/4d248ecb0a/kingdom-manga-100-million-copies-celebration-visual.jpg/m/filters:quality(95)format(webp)" alt="Kingdom cover art" width="640" height="360" loading="lazy">
+        </details>
+      </article>
+      <article class="panel log"><p class="code">Light novels</p><h3>86 Eight-six</h3><p>A thought-provoking series with a unique premise and well-developed characters.</p>
+        <details class="view">
+          <summary class="btn sm"><span class="when-closed">View image</span><span class="when-open">Hide image</span><span class="vh">: 86 Eight-six</span></summary>
+          <img src="https://m.media-amazon.com/images/S/pv-target-images/20c73e8cc65a43cf9cb1788823d2490e30592a0447fbac0da13ddfd706b979c6.jpg" alt="86 Eight-six cover art" width="640" height="360" loading="lazy">
+        </details>
+      </article>
+      <article class="panel log"><p class="code">Games</p><h3>Armored Core VI: Fires of Rubicon</h3><p>An intense mecha simulation game with deep customization options.</p>
+        <details class="view">
+          <summary class="btn sm"><span class="when-closed">View image</span><span class="when-open">Hide image</span><span class="vh">: Armored Core VI: Fires of Rubicon</span></summary>
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzteqGF_yEvyfFD8z5txH5mtCCXue-CreYH9wDxFgh5D0cyizCdNuGnbs&s=10" alt="Armored Core VI: Fires of Rubicon cover art" width="640" height="360" loading="lazy">
+        </details>
+      </article>
+      <article class="panel log"><p class="code">Series</p><h3>The Mentalist</h3><p>A thrilling crime drama with a brilliant detective protagonist.</p>
+        <details class="view">
+          <summary class="btn sm"><span class="when-closed">View image</span><span class="when-open">Hide image</span><span class="vh">: The Mentalist</span></summary>
+          <img src="https://ntvb.tmsimg.com/assets/p7894648_b_h10_ae.jpg?w=1280&h=720" alt="The Mentalist cover art" width="640" height="360" loading="lazy">
+        </details>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== OPEN COMMS CHANNEL: contact ===== -->
+  <!-- EDIT: links and visible text -->
+  <section id="contact" class="sec" aria-labelledby="contact-title">
+    <hgroup class="sec-head">
+      <p class="code">SEC-06 // Contact</p>
+      <h2 id="contact-title">Open comms channel</h2>
+    </hgroup>
+    <div class="tx">
+      <p class="from">KJ // Final transmission</p>
+      <p class="msg">Channel open. Find my work and reach me on GitHub.</p>
+    </div>
+    <ul class="actions" role="list">
+      <li><a class="btn primary" href="https://github.com/kritjau">GitHub: kritjau</a></li>
+    </ul>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<!-- EDIT: update the year each January -->
+<footer class="site-footer">
+  <p class="code">End of transmission</p>
+  <p>Krit Jarupanitkul (KJ), 2026. Built with HTML, CSS &amp; JavaScript.</p>
+</footer>
+
+<script src="script.js" defer></script>
+
+</body>
+</html>
