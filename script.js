@@ -156,19 +156,20 @@ function startTyping() {
   const typeable = (el) => !el.children.length && el.textContent.trim() && getComputedStyle(el, '::before').content === 'none';
   const targets = [...document.querySelectorAll('.title, .sec :is(h2, h3, p, dt, dd, li)')]
     .filter(typeable)
-    .map((el) => [el, getComputedStyle(el).color]);  // keep each element's own colour while it types
-  targets.forEach(([el, color]) => {
+    .map((el) => { const cs = getComputedStyle(el); return [el, cs.color, cs.textShadow]; });  // keep each element's own colour and glow while it types
+  targets.forEach(([el, color, glow]) => {
     const out = document.createElement('span');
     out.className = 'typed';
     out.setAttribute('aria-hidden', 'true');
     out.style.color = color;
+    out.style.textShadow = glow;
     el.classList.add('typing');
     el.append(out);
     io.observe(el);
   });
 }
 
-// Hobby images are linked from other sites and can vanish; swap a broken one for a HUD notice instead of the browser's broken-image icon.
+// If a hobby image is missing (renamed or not committed), swap it for a HUD notice instead of the browser's broken-image icon.
 document.querySelectorAll('.view img').forEach((img) => {
   img.addEventListener('error', () => {
     const lost = document.createElement('p');

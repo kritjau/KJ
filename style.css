@@ -7,6 +7,7 @@
   --muted:   #8A939C;  /* labels, timestamps, secondary text */
   --accent:  #FF6A13;  /* signal orange: buttons, highlights, active states */
   --hud:     #5FD4E6;  /* cyan HUD details: status, meters, focus rings */
+  --hud-glow: 0 0 .6em color-mix(in srgb, var(--hud) 70%, transparent);  /* CRT glow on cyan HUD text and markers */
   --warning: #E0443E;  /* red warning marks, decorative only (too low-contrast for text) */
 
   --on-accent: #0E1013;
@@ -23,7 +24,7 @@ html { font-size: 112.5%; scrollbar-color: var(--border) var(--bg); }  /* scales
 ::selection { background: var(--accent); color: var(--on-accent); }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 html { scroll-snap-type: y mandatory; scroll-padding-top: 3.5rem; }  /* scrolling always lands on a section; browsers still let you scroll inside one taller than the screen */
-@media (max-width: 48rem), (pointer: coarse) {  /* phones/tablets: sections run several screens tall and mobile Safari can fling past or yank back mid-read under mandatory; settle only when close */
+@media (max-width: 48rem), (max-height: 50rem), (pointer: coarse) {  /* phones/tablets, short laptop screens and zoomed-in desktops: sections outgrow the screen, and mandatory yanks back mid-read or fights Page Down; settle only when close */
   html { scroll-snap-type: y proximity; }
 }
 body {
@@ -122,6 +123,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 @media (hover: hover) { .btn:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); } }  /* hover only where it exists: on touch it sticks after a tap */
 .btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn .as-is { text-transform: none; }  /* email addresses stay lowercase so they read and retype correctly */
 .btn.sm { padding: .5rem .9rem; font-size: .75rem; }
 @media (pointer: coarse) {  /* touch: 44px tap targets */
   .btn.sm { padding-block: .8rem; }
@@ -142,6 +144,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   justify-content: center;  /* KJ + nav as one group in the middle */
   gap: 2.5rem;
   padding: .75rem 1rem;
+  background: var(--bg);  /* solid, so page text never scrolls through the nav */
+  border-bottom: 1px solid var(--border);
 }
 .site-header .callsign { display: flex; align-items: center; gap: .6em; color: var(--accent); text-decoration: none; }  /* emblem + KJ, links to top */
 .emblem { width: 2em; height: 2em; }
@@ -227,9 +231,12 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 .tx .from::before { content: ""; display: inline-block; width: .5em; height: .5em; margin-right: .5em; background: var(--hud); }
 .tx .msg::after { content: ""; display: inline-block; width: .55em; height: 1em; margin-left: .3em; vertical-align: -.15em; background: var(--hud); }
 .tx .msg.typing::after { visibility: hidden; }  /* while typing, the typed copy carries the cursor */
+/* cyan HUD readouts glow like the boot log */
+.boot-line:not(:first-child), .sec-head .code, .tx .from, .record .code, .gauge, .status.done { text-shadow: var(--hud-glow); }
+.tx .from::before, .tx .msg::after, .record li::before { box-shadow: var(--hud-glow); }
 
 /* typewriter on big text (script.js): transparent full text reserves the space and stays readable to screen readers, typed copy sits on top */
-.typing { position: relative; color: transparent !important; }  /* !important: must beat every colour rule (.sec-head .code, .tags li, .status.done…) or the full text shows under the typed copy */
+.typing { position: relative; color: transparent !important; text-shadow: none !important; }  /* !important: must beat every colour and glow rule (.sec-head .code, .tags li, .status.done…) or the full text or its glow shows under the typed copy */
 .typed { position: absolute; inset: 0; padding: inherit; pointer-events: none; }  /* same padding so it lines up (tags, status labels); colour set per element by script.js */
 .typed .rest { visibility: hidden; }  /* untyped letters still take their space, so line breaks match the final text */
 .typed .rest::before { content: ""; position: absolute; width: .5em; height: .8em; margin: .1em 0 0 .1em; background: var(--accent); visibility: visible; }  /* cursor; absolute so it adds no width */
@@ -413,8 +420,8 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
   75%, 100% { opacity: .7; }
 }
 .boot-log p { white-space: pre; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 0 .6em color-mix(in srgb, var(--muted) 70%, transparent); }  /* soft CRT glow */
-.boot-log b { font-weight: 400; color: var(--hud); text-shadow: 0 0 .6em color-mix(in srgb, var(--hud) 70%, transparent); }
-.boot-log i { font-style: normal; color: var(--hud); text-shadow: 0 0 .6em color-mix(in srgb, var(--hud) 70%, transparent); }
+.boot-log b { font-weight: 400; color: var(--hud); text-shadow: var(--hud-glow); }
+.boot-log i { font-style: normal; color: var(--hud); text-shadow: var(--hud-glow); }
 @media (max-width: 48rem) {  /* no room for the walls: title only */
   .init { grid-template-columns: minmax(0, 24rem); justify-content: center; }
   .boot-log { display: none; }
