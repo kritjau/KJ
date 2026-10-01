@@ -352,6 +352,8 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 
 /* ===== Off-duty log ===== */
 .log h3 + p { color: var(--muted); }
+.log { min-height: 16rem; }  /* = tallest closed card (Armored Core VI: 2-line title), so closed cards match without row stretching */
+#offduty .grid { align-items: start; }  /* an opened image grows only its own card, not the whole row */
 .view { width: 100%; margin-top: auto; }  /* "View image" toggle, native <details> */
 .view summary { list-style: none; }
 .view summary::-webkit-details-marker { display: none; }
