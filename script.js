@@ -232,6 +232,215 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
   });
 }
 
+// Mission 02 simulation: a small Asteroids in the site's HUD colours (the real one is Pygame, on GitHub).
+// Runs only while its popup is open. Keys: arrows or W/A/D to fly, Space to fire, Enter to retry, Esc closes.
+const sim = document.getElementById('m02-sim');
+if (sim) {
+  const cv = sim.querySelector('canvas'), g = cv.getContext('2d');
+  const W = cv.width, H = cv.height, dpr = devicePixelRatio || 1;
+  cv.width = W * dpr; cv.height = H * dpr; g.scale(dpr, dpr);  // sharp on high-DPI screens, game still works in 800x500
+  const css = getComputedStyle(html), col = (v) => css.getPropertyValue(v).trim();
+  const C = { hud: col('--hud'), accent: col('--accent'), text: col('--text'), muted: col('--muted') };
+  const R = [0, 12, 22, 40], POINTS = [0, 100, 50, 20];  // per rock size 1-3: radius, score
+  const keys = new Set();
+  let ship, rocks, shots, score, lives, wave, over, last, frame = 0;
+
+  const wrap = (o) => { o.x = (o.x + W) % W; o.y = (o.y + H) % H; };
+  const newShip = () => ({ x: W / 2, y: H / 2, vx: 0, vy: 0, a: -Math.PI / 2, safe: 2, cool: 0 });  // safe: seconds of spawn shield
+  const rock = (x, y, size) => {
+    const a = Math.random() * Math.PI * 2, v = 30 + (3 - size) * 35 + wave * 5;
+    return { x, y, size, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+      pts: Array.from({ length: 9 }, (_, i) => [i / 9 * Math.PI * 2, .75 + Math.random() * .35]) };  // jagged outline
+  };
+  const nextWave = () => {
+    wave++;
+    for (let i = 0; i < 2 + wave; i++) rocks.push(rock(Math.random() * W, Math.random() < .5 ? 0 : H - 1, 3));  // from top/bottom edge, away from the ship
+  };
+  const reset = () => { ship = newShip(); rocks = []; shots = []; score = 0; lives = 3; wave = 0; over = false; nextWave(); };
+  const held = (...ks) => ks.some((k) => keys.has(k));
+
+  const update = (dt) => {
+    if (over) { if (held('Enter')) reset(); return; }
+    const s = ship;
+    s.a += (held('ArrowRight', 'd') - held('ArrowLeft', 'a')) * 4 * dt;
+    s.thrust = held('ArrowUp', 'w');
+    if (s.thrust) { s.vx += Math.cos(s.a) * 260 * dt; s.vy += Math.sin(s.a) * 260 * dt; }
+    s.vx *= 1 - .5 * dt; s.vy *= 1 - .5 * dt;  // drag, so it drifts to a stop
+    s.x += s.vx * dt; s.y += s.vy * dt; wrap(s);
+    s.safe -= dt; s.cool -= dt;
+    if (held(' ') && s.cool <= 0) {
+      shots.push({ x: s.x + Math.cos(s.a) * 14, y: s.y + Math.sin(s.a) * 14, vx: s.vx + Math.cos(s.a) * 480, vy: s.vy + Math.sin(s.a) * 480, life: .9 });
+      s.cool = .2;
+    }
+    for (const o of [...shots, ...rocks]) { o.x += o.vx * dt; o.y += o.vy * dt; wrap(o); }
+    shots = shots.filter((b) => (b.life -= dt) > 0);
+    for (const b of shots) {
+      const hit = rocks.find((r) => Math.hypot(r.x - b.x, r.y - b.y) < R[r.size]);
+      if (!hit) continue;
+      b.life = 0; score += POINTS[hit.size];
+      rocks.splice(rocks.indexOf(hit), 1);
+      if (hit.size > 1) rocks.push(rock(hit.x, hit.y, hit.size - 1), rock(hit.x, hit.y, hit.size - 1));  // splits in two
+    }
+    shots = shots.filter((b) => b.life > 0);
+    if (s.safe <= 0 && rocks.some((r) => Math.hypot(r.x - s.x, r.y - s.y) < R[r.size] + 8)) {
+      if (--lives === 0) over = true; else ship = newShip();
+    }
+    if (!rocks.length) nextWave();
+  };
+
+  const draw = () => {
+    g.clearRect(0, 0, W, H);
+    g.lineWidth = 1.5; g.lineJoin = 'round';
+    g.strokeStyle = C.text;
+    for (const r of rocks) {
+      g.beginPath();
+      for (const [a, k] of r.pts) g.lineTo(r.x + Math.cos(a) * R[r.size] * k, r.y + Math.sin(a) * R[r.size] * k);
+      g.closePath(); g.stroke();
+    }
+    g.fillStyle = C.accent;
+    for (const b of shots) g.fillRect(b.x - 1.5, b.y - 1.5, 3, 3);
+    const s = ship;
+    if (!over && !(s.safe > 0 && Math.floor(s.safe * 8) % 2)) {  // blinks while shielded
+      g.save(); g.translate(s.x, s.y); g.rotate(s.a);
+      g.strokeStyle = C.hud; g.shadowColor = C.hud; g.shadowBlur = 8;
+      g.beginPath(); g.moveTo(14, 0); g.lineTo(-10, 8); g.lineTo(-6, 0); g.lineTo(-10, -8); g.closePath(); g.stroke();
+      if (s.thrust) { g.strokeStyle = C.accent; g.shadowColor = C.accent; g.beginPath(); g.moveTo(-8, 4); g.lineTo(-16 - Math.random() * 6, 0); g.lineTo(-8, -4); g.stroke(); }
+      g.restore();
+    }
+    g.font = '600 13px ui-monospace, Consolas, monospace'; g.fillStyle = C.hud;
+    g.textAlign = 'left'; g.fillText(`SCORE ${score}`, 14, 24);
+    g.textAlign = 'right'; g.fillText(`WAVE ${wave} // HULL ${'■'.repeat(lives)}${'□'.repeat(3 - lives)}`, W - 14, 24);
+    if (over) {
+      g.textAlign = 'center'; g.fillStyle = C.accent; g.font = '800 28px ui-monospace, Consolas, monospace';
+      g.fillText('MISSION FAILED', W / 2, H / 2 - 8);
+      g.font = '600 13px ui-monospace, Consolas, monospace'; g.fillStyle = C.muted;
+      g.fillText(`SCORE ${score} // PRESS ENTER TO RETRY`, W / 2, H / 2 + 22);
+    }
+  };
+
+  const tick = (t) => { update(Math.min((t - last) / 1000, .05)); last = t; draw(); frame = requestAnimationFrame(tick); };
+  sim.addEventListener('toggle', (e) => {
+    if (e.newState === 'open') { reset(); last = performance.now(); frame = requestAnimationFrame(tick); }
+    else { cancelAnimationFrame(frame); keys.clear(); }
+  });
+  const GAME_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'a', 'd', 'w', 'Enter'];
+  const key = (e) => (e.key.length === 1 ? e.key.toLowerCase() : e.key);
+  addEventListener('keydown', (e) => {
+    if (!sim.matches(':popover-open') || !GAME_KEYS.includes(key(e))) return;
+    e.preventDefault();  // no page scrolling or button presses while playing
+    keys.add(key(e));
+  });
+  addEventListener('keyup', (e) => keys.delete(key(e)));
+}
+
+// Terminal: the console in the hero (index.html .term). Commands drive the real page: fly to sections, launch the
+// Mission 02 simulation, open links. Facts are read from the page, so editing index.html keeps it in sync.
+// Drag it by its title bar with a mouse; double-click the bar to put it back.
+const term = document.querySelector('.term');
+if (term) {
+  const out = term.querySelector('.term-out'), input = term.querySelector('input'), bar = term.querySelector('.term-bar');
+  const print = (text, cls) => {
+    const p = document.createElement('p');
+    if (cls) p.className = cls;
+    p.textContent = text;
+    out.append(p);
+    out.scrollTop = out.scrollHeight;
+  };
+  const SECTIONS = { about: 'about', record: 'record', skills: 'skills', projects: 'projects', hobbies: 'offduty', contact: 'contact' };
+  const link = (re) => [...document.links].find((a) => re.test(a.href))?.href;
+  const TARGETS = { github: () => link(/github\.com\/kritjau\/?$/), asteroids: () => link(/asteroids/), plate: () => link(/THAI_ALP/i) };
+  const sheet = (key) => [...document.querySelectorAll('.sheet dt')].find((d) => d.textContent.trim().toLowerCase() === key)?.nextElementSibling.textContent.trim() || '?';
+  const booted = Date.now();
+  const CMDS = {
+    help: () => print([
+      'help              this list',
+      'whoami            who is flying',
+      'ls                sections on this page',
+      'goto <section>    fly there (cd works too)',
+      'sortie            launch the Mission 02 simulation',
+      'open <target>     github, asteroids or plate',
+      'contact           comms channels',
+      'neofetch          system info',
+      'clear             clear the screen',
+    ].join('\n')),
+    whoami: () => print(`kj (Krit Jarupanitkul)\n${document.querySelector('.tagline').textContent.trim()}`),
+    ls: () => print(Object.keys(SECTIONS).join('  ')),
+    goto: (to = '') => {
+      const id = SECTIONS[to.toLowerCase()];
+      if (!id) return print(to ? `goto: no such section: ${to}. Try ls` : 'goto: which section? Try ls', 'err');
+      print(`Moving to ${document.querySelector(`#${id} .sec-head .code`).textContent.trim()}`);
+      document.getElementById(id).scrollIntoView();
+    },
+    sortie: () => {
+      const sim = document.getElementById('m02-sim');
+      if (!sim || matchMedia('(pointer: coarse)').matches) return print('sortie: the simulation needs a keyboard', 'err');
+      print('Launching Mission 02 simulation...');
+      sim.showPopover();
+    },
+    open: (what = '') => {
+      const url = TARGETS[what.toLowerCase()]?.();
+      if (!url) return print(`open: unknown target: ${what || '(none)'}. Try github, asteroids or plate`, 'err');
+      print(`Opening ${url}`);
+      open(url, '_blank', 'noopener');
+    },
+    contact: () => document.querySelectorAll('#contact .actions a').forEach((a) => print(a.textContent.trim())),
+    neofetch: () => {
+      const up = Math.floor((Date.now() - booted) / 1000);
+      print([
+        'kj@rubicon', '----------',
+        'OS      Arch Linux x86_64',
+        'Host    Rangsit University',
+        'Shell   kjsh',
+        `Uptime  ${Math.floor(up / 60)}m ${up % 60}s`,
+        `Focus   ${sheet('focus')}`,
+        `Lang    ${sheet('languages')}`,
+      ].join('\n'));
+    },
+    clear: () => out.replaceChildren(),
+    date: () => print(new Date().toString()),
+    echo: (...words) => print(words.join(' ')),
+    sudo: () => print('kj is not in the sudoers file. This incident will be reported.', 'err'),
+    exit: () => print('There is no exit from the cockpit. Try goto contact.'),
+  };
+  CMDS.cd = CMDS.goto;
+
+  const past = [];
+  let back = 0;  // position in past while browsing with up/down
+  term.querySelector('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const line = input.value.trim();
+    input.value = '';
+    print(`kj@rubicon:~$ ${line}`, 'cmd');
+    if (!line) return;
+    past.push(line);
+    back = past.length;
+    const [cmd, ...args] = line.split(/\s+/);
+    (CMDS[cmd.toLowerCase()] || (() => print(`kjsh: command not found: ${cmd}. Type help.`, 'err')))(...args);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    back = Math.max(0, Math.min(past.length, back + (e.key === 'ArrowUp' ? -1 : 1)));
+    input.value = past[back] ?? '';
+  });
+  term.addEventListener('click', (e) => { if (e.target !== bar && !getSelection().toString()) input.focus(); });
+
+  let grab = null;  // pointer offset from the drag start
+  bar.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    grab = { x: e.clientX - (parseFloat(term.style.getPropertyValue('--tx')) || 0), y: e.clientY - (parseFloat(term.style.getPropertyValue('--ty')) || 0) };
+    bar.setPointerCapture(e.pointerId);
+    term.classList.add('dragging');
+  });
+  bar.addEventListener('pointermove', (e) => {
+    if (!grab) return;
+    term.style.setProperty('--tx', `${e.clientX - grab.x}px`);
+    term.style.setProperty('--ty', `${e.clientY - grab.y}px`);
+  });
+  bar.addEventListener('lostpointercapture', () => { grab = null; term.classList.remove('dragging'); });
+  bar.addEventListener('dblclick', () => { term.style.removeProperty('--tx'); term.style.removeProperty('--ty'); });
+}
+
 if (html.classList.contains('initializing')) showInit(startTyping);
 else startTyping();
 

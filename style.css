@@ -221,6 +221,41 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
   margin-bottom: 1.5rem;
 }
 .hero-rest { max-width: 40rem; }
+.hero-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 2rem; }
+
+/* ===== Terminal (script.js): a small console in the hero that drives the page ===== */
+.term {
+  position: relative;
+  z-index: 10;  /* above the next sections while dragged */
+  flex: 0 1 26rem;
+  min-width: min(100%, 20rem);
+  translate: var(--tx, 0) var(--ty, 0);  /* drag offset */
+  font: .8125rem/1.6 var(--mono);
+  --edge: var(--border);
+  background: var(--bg);
+  border: 1px solid var(--edge);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);  /* one chamfer, like the panels */
+}
+.term:focus-within { --edge: var(--hud); }
+.term-bar {
+  padding: .35rem .75rem;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--edge) 0 50%, transparent 0) top right / var(--cut) var(--cut) no-repeat, var(--panel);  /* border along the cut corner */
+  border-bottom: 1px solid var(--edge);
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  user-select: none;
+}
+@media (pointer: fine) { .term-bar { cursor: grab; touch-action: none; } .term.dragging .term-bar { cursor: grabbing; } }
+.term-out { height: 11rem; overflow-y: auto; padding: .6rem .75rem 0; color: var(--hud); scrollbar-width: thin; }
+.term-out p { white-space: pre-wrap; }
+.term-out b { color: var(--text); font-weight: 600; }
+.term-out .cmd { color: var(--text); }
+.term-out .err { color: var(--accent); }
+.term-out a { color: var(--accent); }
+.term-line { display: flex; gap: .6em; padding: .25rem .75rem .6rem; }
+.term-prompt { color: var(--accent); white-space: nowrap; }
+.term-line input { flex: 1; min-width: 0; padding: 0; border: 0; background: none; color: var(--text); font: inherit; caret-color: var(--accent); outline: none; }
 .tagline { font-size: 1.25rem; font-weight: 600; margin-bottom: .5rem; }
 .intro { color: var(--muted); margin-bottom: 2rem; }
 
@@ -354,6 +389,14 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 .denied-code::before { content: ""; display: inline-block; width: .6em; height: .6em; margin-right: .5em; background: var(--warning); }
 .denied-title { margin: .4rem 0 .6rem; font: 800 1.5rem/1.1 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
 .denied .btn { margin-top: 1.25rem; }
+.panel .actions { margin-top: auto; }  /* Play + GitHub sit at the bottom like single buttons */
+/* Mission 02 simulation popup: a playable Asteroids (script.js), native popover like the access-denied one */
+.sim { width: min(52rem, calc(100% - 2rem)); padding: 1.25rem; border: 1px solid var(--hud); background: var(--panel); color: var(--text); }
+.sim::backdrop { background: rgb(14 16 19 / .8); }
+.sim-code { font: 600 .75rem/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--hud); text-shadow: var(--hud-glow); }
+.sim-screen { display: block; width: 100%; height: auto; margin-block: .75rem; background: var(--bg); border: 1px solid var(--border); }
+.sim-help { font: .75rem/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+@media (pointer: coarse) { .play { display: none; } }  /* keyboard game: no Play button on touch screens */
 
 /* ===== Off-duty log ===== */
 .log h3 + p { color: var(--muted); }
@@ -382,7 +425,7 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 
 /* ===== Start-up screen (script.js, first visit per session) ===== */
 .initializing body > :not(.init) { visibility: hidden; }
-.initializing .boot-line, .initializing .hero-rest { animation-play-state: paused; }  /* hero boot waits its turn */
+.initializing .boot-line, .initializing .hero-rest, .initializing .term { animation-play-state: paused; }  /* hero boot waits its turn */
 .init {
   position: fixed;
   inset: 0;
@@ -468,7 +511,7 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 /* ===== Motion: only when the visitor allows it ===== */
 @media (prefers-reduced-motion: no-preference) {
   .boot-line { animation: type calc(var(--n) * 12ms) steps(var(--n)) var(--d) both; }
-  .hero-rest { animation: fade .4s ease-out 1.9s both; }
+  .hero-rest, .term { animation: fade .4s ease-out 1.9s both; }
   .typed .rest::before { animation: blink 1s step-end infinite; }  /* only exists while typing */
   .tx .msg:not(.typing)::after { animation: blink 1s step-end 5; }  /* blinks 5 times once its message lands, then holds solid (WCAG 2.2.2: nothing blinks past 5s) */
   .view[open] img { animation: img-open .3s cubic-bezier(.16, 1, .3, 1); }  /* hobby image scans open like the panels */

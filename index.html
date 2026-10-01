@@ -52,14 +52,25 @@ try {
       <p class="boot-line" style="--n:37; --d:.6s">STATUS: STUDENT // RANGSIT UNIVERSITY</p>
     </div>
     <h1 class="title" id="hero-title" data-delay="1100" data-speed="45">Krit Jarupanitkul</h1>
-    <div class="hero-rest">
-      <!-- EDIT: tagline and intro -->
-      <p class="tagline">Digital innovation and artificial intelligence student at Rangsit University.</p>
-      <p class="intro">I enjoy building things and learning new stuff.</p>
-      <div class="actions">
-        <a class="btn primary" href="#about">▶ Pilot profile</a>
-        <a class="btn" href="#projects">View projects</a>
+    <div class="hero-row">
+      <div class="hero-rest">
+        <!-- EDIT: tagline and intro -->
+        <p class="tagline">Digital innovation and artificial intelligence student at Rangsit University.</p>
+        <p class="intro">I enjoy building things and learning new stuff.</p>
+        <div class="actions">
+          <a class="btn primary" href="#about">▶ Pilot profile</a>
+          <a class="btn" href="#projects">View projects</a>
+        </div>
       </div>
+      <!-- Console: commands live in script.js ("Terminal") -->
+      <section class="term" aria-label="Terminal">
+        <p class="term-bar">kjsh // kj@rubicon</p>
+        <div class="term-out" aria-live="polite"><p>Console online. Type <b>help</b> and press Enter.</p></div>
+        <form class="term-line">
+          <label class="term-prompt" for="term-in">kj@rubicon:~$</label>
+          <input id="term-in" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send">
+        </form>
+      </section>
     </div>
   </section>
 
@@ -188,7 +199,16 @@ try {
         <p class="code">2026 // Solo project</p>
         <p>A retro-style space shooter game built for fun while learning game development concepts.</p>
         <ul class="tags" role="list"><li>Python</li><li>Pygame</li><li>Game development</li></ul>
-        <a class="btn sm" href="https://github.com/kritjau/asteroids">View on GitHub<span class="vh">: Asteroids</span></a>
+        <div class="actions">
+          <button class="btn sm primary play" type="button" popovertarget="m02-sim">▶ Play<span class="vh">: Asteroids in the browser</span></button>
+          <a class="btn sm" href="https://github.com/kritjau/asteroids">View on GitHub<span class="vh">: Asteroids</span></a>
+        </div>
+        <div class="sim" id="m02-sim" popover role="dialog" aria-labelledby="m02-sim-title">
+          <p class="sim-code" id="m02-sim-title">Simulation // Mission 02 — Asteroids</p>
+          <canvas class="sim-screen" width="800" height="500" aria-label="Asteroids game. Arrow keys or W A D to fly, Space to fire."></canvas>
+          <p class="sim-help">← → turn // ↑ thrust // Space fire // Esc exit</p>
+          <button class="btn sm" type="button" popovertarget="m02-sim" popovertargetaction="hide">Close</button>
+        </div>
       </article>
       <article class="panel mission">
         <p class="status active">In progress</p>
