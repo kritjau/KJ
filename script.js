@@ -179,6 +179,86 @@ document.querySelectorAll('.view img').forEach((img) => {
   }, { once: true });
 });
 
+// Cockpit parallax: feeds style.css "Motion". The grid follows the whole screen (--px/--py, -1 to 1); each card on screen
+// leans toward the mouse by itself (--dx/--dy), up to 10px when the mouse is on it, fading out 600px away. Everything eases.
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const goal = { x: innerWidth / 2, y: innerHeight / 2 }, now = { ...goal };
+  let away = true, frame = 0;  // away: mouse outside the window (or a phone), so cards rest
+  let tilted = null;  // panel under the mouse, tilted toward it (style.css: --rx/--ry, up to 3deg)
+  const tilt = (p, e) => {
+    if (p !== tilted) { tilted?.style.removeProperty('--rx'); tilted?.style.removeProperty('--ry'); tilted = p; }
+    if (!p) return;
+    const r = p.getBoundingClientRect();
+    p.style.setProperty('--rx', `${((.5 - (e.clientY - r.top) / r.height) * 6).toFixed(2)}deg`);
+    p.style.setProperty('--ry', `${(((e.clientX - r.left) / r.width - .5) * 6).toFixed(2)}deg`);
+  };
+  const lean = new Map();  // card -> its current [dx, dy]
+  const io = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? lean.set(e.target, lean.get(e.target) || [0, 0]) : lean.delete(e.target))));
+  document.querySelectorAll('.panel, .tx').forEach((el) => io.observe(el));
+
+  const step = () => {
+    now.x += (goal.x - now.x) * .04;
+    now.y += (goal.y - now.y) * .04;
+    let busy = Math.abs(goal.x - now.x) + Math.abs(goal.y - now.y) > .5;
+    html.style.setProperty('--px', (now.x / innerWidth * 2 - 1).toFixed(3));
+    html.style.setProperty('--py', (now.y / innerHeight * 2 - 1).toFixed(3));
+    for (const [el, [dx, dy]] of lean) {
+      const r = el.getBoundingClientRect();
+      const vx = now.x - (r.left + r.width / 2 - dx), vy = now.y - (r.top + r.height / 2 - dy);  // from the card's resting centre
+      const d = Math.hypot(vx, vy) || 1;
+      const k = away ? 0 : Math.max(0, 1 - d / 275) * 10;
+      const nx = dx + (vx / d * k - dx) * .06, ny = dy + (vy / d * k - dy) * .06;
+      busy ||= Math.abs(nx - dx) + Math.abs(ny - dy) > .02;
+      lean.set(el, [nx, ny]);
+      el.style.setProperty('--dx', `${nx.toFixed(2)}px`);
+      el.style.setProperty('--dy', `${ny.toFixed(2)}px`);
+    }
+    frame = busy ? requestAnimationFrame(step) : 0;  // sleeps once everything has settled
+  };
+  const wake = () => { frame ||= requestAnimationFrame(step); };
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    away = false; goal.x = e.clientX; goal.y = e.clientY; wake();
+    tilt(e.target.closest('.panel'), e);
+  });
+  document.addEventListener('mouseleave', () => { away = true; goal.x = innerWidth / 2; goal.y = innerHeight / 2; wake(); tilt(null); });
+  addEventListener('scroll', wake, { passive: true });  // cards move under a still mouse
+  // Phones: tilt drifts the grid only (held at ~45° = centred). ponytail: Android only; iOS needs a tap-to-allow
+  // (DeviceOrientationEvent.requestPermission), add a button for it if wanted.
+  addEventListener('deviceorientation', (e) => {
+    if (e.gamma === null) return;
+    const c = (v) => Math.max(-1, Math.min(1, v));
+    goal.x = (c(e.gamma / 30) + 1) / 2 * innerWidth; goal.y = (c((e.beta - 45) / 30) + 1) / 2 * innerHeight; wake();
+  });
+}
+
+// Click to target: clicking empty background (not text, cards or controls) drops a HUD lock-on marker: square brackets
+// close in on the point with a coordinate readout, then fade. Decorative, so skipped with reduced motion.
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const svg = (tag, attrs = {}) => {
+    const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  };
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('a, button, summary, input, .panel, .tx, .site-header, h1, h2, h3, p, li, img') || getSelection().toString()) return;
+    const { clientX: x, clientY: y } = e;
+    const brackets = svg('path', { d: 'M-16-8V-16H-8M8-16H16V-8M16 8V16H8M-8 16H-16V8' });
+    const flip = x > innerWidth - 240;  // readout goes left of the marker near the right edge
+    const readout = svg('text', { x: flip ? -26 : 26, y: 4, 'text-anchor': flip ? 'end' : 'start' });
+    readout.textContent = `X${Math.round(x)} Y${Math.round(y)} // No contact`;
+    const marker = svg('g');
+    marker.style.translate = `${x}px ${y}px`;
+    marker.append(brackets, svg('circle', { r: 1.5 }), readout);
+    const shot = svg('svg', { class: 'target', 'aria-hidden': 'true' });
+    shot.append(marker);
+    document.body.append(shot);
+    brackets.animate([{ scale: 2, opacity: 0 }, { scale: 1, opacity: 1 }], { duration: 220, easing: 'cubic-bezier(.2, 0, 0, 1)' });  // closes in
+    readout.animate([{ opacity: 0 }, { opacity: 0, offset: .25 }, { opacity: 1, offset: .3 }], { duration: 800 });  // appears once locked
+    marker.animate([{ opacity: 1, offset: .75 }, { opacity: 0 }], { duration: 1200 }).finished.then(() => shot.remove());
+  });
+}
+
 if (html.classList.contains('initializing')) showInit(startTyping);
 else startTyping();
 

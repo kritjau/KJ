@@ -13,17 +13,19 @@
   --on-accent: #0E1013;
   --on-warning: #FFFFFF;  /* text on red; the red behind it must be darkened to pass contrast, see .status.secret */
   --cut: 14px;  /* chamfer size on panels */
+  --header: 3.5rem;  /* sticky header height */
+  --gap: 1.75rem;  /* space between the header and a section's top stripe, and between its bottom stripe and the screen edge */
   --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif;
   color-scheme: dark;
 }
 
 /* ===== Base ===== */
-html { font-size: 112.5%; scrollbar-color: var(--border) var(--bg); }  /* scales all text: 1rem = 18px at default browser settings; themed scrollbar */
+html { font-size: clamp(112.5%, 62.5% + .625vw, 137.5%); scrollbar-color: var(--border) var(--bg); }  /* scales everything (all sizes are rem): 1rem = 18px up to a 1280px-wide window, growing to 22px at 1920px; themed scrollbar */
 * { box-sizing: border-box; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
-html { scroll-snap-type: y mandatory; scroll-padding-top: 3.5rem; }  /* scrolling always lands on a section; browsers still let you scroll inside one taller than the screen */
+html { scroll-snap-type: y mandatory; scroll-padding-top: calc(var(--header) + var(--gap)); }  /* scrolling always lands on a section; browsers still let you scroll inside one taller than the screen */
 @media (max-width: 48rem), (max-height: 50rem), (pointer: coarse) {  /* phones/tablets, short laptop screens and zoomed-in desktops: sections outgrow the screen, and mandatory yanks back mid-read or fights Page Down; settle only when close */
   html { scroll-snap-type: y proximity; }
 }
@@ -41,7 +43,7 @@ body {
 html::before {
   content: "";
   position: fixed;
-  inset: 0;
+  inset: -32px;  /* bleeds past the screen so the parallax drift (see Motion) never shows an edge */
   z-index: -1;
   pointer-events: none;
   background-image:
@@ -143,7 +145,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   align-items: center;
   justify-content: center;  /* KJ + nav as one group in the middle */
   gap: 2.5rem;
-  padding: .75rem 1rem;
+  height: var(--header);
+  padding: 0 1rem;
   background: var(--bg);  /* solid, so page text never scrolls through the nav */
   border-bottom: 1px solid var(--border);
 }
@@ -169,7 +172,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 /* ===== Layout ===== */
 main, .site-footer { max-width: 68rem; margin-inline: auto; padding-inline: 1rem; }
 .sec {  /* every section fills the screen under the sticky header, like the title screen */
-  min-height: calc(100svh - 7rem);  /* header gap above, matching gap below the bottom stripe */
+  min-height: calc(100svh - var(--header) - 2 * var(--gap));  /* fills the screen between the header and the same gap at the bottom */
+  margin-block: var(--gap);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -184,14 +188,14 @@ main, .site-footer { max-width: 68rem; margin-inline: auto; padding-inline: 1rem
 @media (max-width: 36rem) { .grid.loadout { grid-template-columns: 1fr; } }  /* phones: one per row */
 h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 
-/* hazard stripe along the bottom edge of every section; the title screen gets one on top too */
+/* hazard stripes along the top and bottom edge of every section */
 :root { --hazard: repeating-linear-gradient(-45deg, var(--accent) 0 16px, var(--bg) 16px 24px); }  /* orange dash length, then dash + gap */
-.hero, .sec { background: var(--hazard) bottom / 100% 4px no-repeat; }
-.hero { border-top: 4px solid; border-image: var(--hazard) 1; }
+.hero, .sec { background: var(--hazard) top / 100% 4px no-repeat, var(--hazard) bottom / 100% 4px no-repeat; }
 
 /* ===== Hero: boot sequence ===== */
 .hero {
-  min-height: calc(100svh - 7rem);  /* full screen minus sticky header (3.5rem) and a matching gap below the bottom stripe */
+  min-height: calc(100svh - var(--header) - 2 * var(--gap));  /* same screen-filling box as .sec */
+  margin-block: var(--gap);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -452,6 +456,12 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 @keyframes fill { from { width: 0; } to { width: 100%; } }
 @keyframes draw { from { transform: scaleX(0); } }
 
+/* ===== Click to target (script.js): one throwaway SVG per click, over the page but under the scanlines ===== */
+.target { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 45; pointer-events: none; overflow: visible; }
+.target g { fill: var(--hud); stroke: var(--hud); filter: drop-shadow(var(--hud-glow)); }
+.target path { fill: none; stroke-width: 1.5; }
+.target text { stroke: none; font: 600 .6875rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+
 /* ===== Print / save as PDF: show everything, drop the screen effects ===== */
 @media print {
   .typing { color: inherit !important; }
@@ -470,6 +480,14 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
   @media (hover: hover) { .btn:hover { animation: glitch .28s steps(1) 1; } }
   .denied:popover-open { animation: glitch .28s steps(1) 1; }
   body::before { animation: clouds 15s linear infinite; }  /* 300vw per 15s: same drift speed as before */
+  /* Cockpit parallax (script.js): the far grid drifts against the mouse or phone tilt (--px/--py, -1 to 1),
+     and each card on screen leans toward the mouse on its own (--dx/--dy), the nearest card the most. */
+  html::before { translate: calc(var(--px, 0) * -24px) calc(var(--py, 0) * -24px); }
+  .panel, .tx { translate: var(--dx, 0) var(--dy, 0); }
+  /* Panel under the mouse tilts in 3D toward the pointer (--rx/--ry from script.js). */
+  @media (hover: hover) {
+    .panel { transform: perspective(60rem) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .5s cubic-bezier(.2, 0, 0, 1); }
+  }
 }
 @keyframes clouds { to { transform: translateX(300vw); } }
 @keyframes type { from { width: 0; } }
