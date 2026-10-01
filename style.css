@@ -173,7 +173,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 main, .site-footer { max-width: 68rem; margin-inline: auto; padding-inline: 1rem; }
 .sec {  /* every section fills the screen under the sticky header, like the title screen */
   min-height: calc(100svh - var(--header) - 2 * var(--gap));  /* fills the screen between the header and the same gap at the bottom */
-  margin-block: var(--gap);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -188,14 +187,16 @@ main, .site-footer { max-width: 68rem; margin-inline: auto; padding-inline: 1rem
 @media (max-width: 36rem) { .grid.loadout { grid-template-columns: 1fr; } }  /* phones: one per row */
 h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 
-/* hazard stripes along the top and bottom edge of every section */
+/* hazard stripe along the bottom edge of every section. Sections touch, so when one is snapped into place the stripe of
+   the section above sits one gap under the header as its top line; the title screen has nothing above it, so it gets its own. */
 :root { --hazard: repeating-linear-gradient(-45deg, var(--accent) 0 16px, var(--bg) 16px 24px); }  /* orange dash length, then dash + gap */
-.hero, .sec { background: var(--hazard) top / 100% 4px no-repeat, var(--hazard) bottom / 100% 4px no-repeat; }
+.hero, .sec { background: var(--hazard) bottom / 100% 4px no-repeat; }
+.hero { background: var(--hazard) top / 100% 4px no-repeat, var(--hazard) bottom / 100% 4px no-repeat; }
 
 /* ===== Hero: boot sequence ===== */
 .hero {
   min-height: calc(100svh - var(--header) - 2 * var(--gap));  /* same screen-filling box as .sec */
-  margin-block: var(--gap);
+  margin-top: var(--gap);  /* gap under the header at the top of the page */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -455,12 +456,6 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 .init-bar::after { content: ""; display: block; width: 0; height: 100%; background: var(--accent); animation: fill 1.5s linear .3s both; }
 @keyframes fill { from { width: 0; } to { width: 100%; } }
 @keyframes draw { from { transform: scaleX(0); } }
-
-/* ===== Click to target (script.js): one throwaway SVG per click, over the page but under the scanlines ===== */
-.target { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 45; pointer-events: none; overflow: visible; }
-.target g { fill: var(--hud); stroke: var(--hud); filter: drop-shadow(var(--hud-glow)); }
-.target path { fill: none; stroke-width: 1.5; }
-.target text { stroke: none; font: 600 .6875rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 
 /* ===== Print / save as PDF: show everything, drop the screen effects ===== */
 @media print {

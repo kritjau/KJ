@@ -232,33 +232,6 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
   });
 }
 
-// Click to target: clicking empty background (not text, cards or controls) drops a HUD lock-on marker: square brackets
-// close in on the point with a coordinate readout, then fade. Decorative, so skipped with reduced motion.
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const svg = (tag, attrs = {}) => {
-    const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    for (const k in attrs) n.setAttribute(k, attrs[k]);
-    return n;
-  };
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('a, button, summary, input, .panel, .tx, .site-header, h1, h2, h3, p, li, img') || getSelection().toString()) return;
-    const { clientX: x, clientY: y } = e;
-    const brackets = svg('path', { d: 'M-16-8V-16H-8M8-16H16V-8M16 8V16H8M-8 16H-16V8' });
-    const flip = x > innerWidth - 240;  // readout goes left of the marker near the right edge
-    const readout = svg('text', { x: flip ? -26 : 26, y: 4, 'text-anchor': flip ? 'end' : 'start' });
-    readout.textContent = `X${Math.round(x)} Y${Math.round(y)} // No contact`;
-    const marker = svg('g');
-    marker.style.translate = `${x}px ${y}px`;
-    marker.append(brackets, svg('circle', { r: 1.5 }), readout);
-    const shot = svg('svg', { class: 'target', 'aria-hidden': 'true' });
-    shot.append(marker);
-    document.body.append(shot);
-    brackets.animate([{ scale: 2, opacity: 0 }, { scale: 1, opacity: 1 }], { duration: 220, easing: 'cubic-bezier(.2, 0, 0, 1)' });  // closes in
-    readout.animate([{ opacity: 0 }, { opacity: 0, offset: .25 }, { opacity: 1, offset: .3 }], { duration: 800 });  // appears once locked
-    marker.animate([{ opacity: 1, offset: .75 }, { opacity: 0 }], { duration: 1200 }).finished.then(() => shot.remove());
-  });
-}
-
 if (html.classList.contains('initializing')) showInit(startTyping);
 else startTyping();
 
