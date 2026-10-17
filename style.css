@@ -12,7 +12,7 @@
 
   --on-accent: #0E1013;
   --on-warning: #FFFFFF;  /* text on red; the red behind it must be darkened to pass contrast, see .status.secret */
-  --cut: 14px;  /* chamfer size on panels */
+  --cut: .75rem;  /* chamfer size on panels; rem so it scales with the screen like everything else */
   --header: 3.5rem;  /* sticky header height */
   --gap: 1.75rem;  /* space between the header and a section's top stripe, and between its bottom stripe and the screen edge */
   --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
@@ -21,7 +21,8 @@
 }
 
 /* ===== Base ===== */
-html { font-size: clamp(112.5%, 62.5% + .625vw, 137.5%); scrollbar-color: var(--border) var(--bg); }  /* scales everything (all sizes are rem): 1rem = 18px up to a 1280px-wide window, growing to 22px at 1920px; themed scrollbar */
+html { --w: max(112.5%, 62.5% + .625vw, 1.146vw); font-size: var(--w); scrollbar-color: var(--border) var(--bg); }  /* scales everything (all sizes are rem): 1rem = 18px up to a 1280px-wide window, growing to 22px at 1920px, then in proportion (1.146vw), so 1440p and 4K look like a bigger 1080p; themed scrollbar */
+@media (min-width: 48rem) { html { font-size: min(var(--w), max(93.75%, 2.15vh)); } }  /* past phone width, also shrink to the screen height (down to 15px) so each section fits one screen on short laptops and ultrawides */
 * { box-sizing: border-box; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
@@ -176,7 +177,7 @@ main, .site-footer { max-width: 68rem; margin-inline: auto; padding-inline: 1rem
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-block: 4rem;
+  padding-block: 2rem;  /* 4rem pushed most sections past the screen height */
   scroll-snap-align: start;
 }
 .sec-head { margin-bottom: 1.25rem; }
@@ -189,9 +190,9 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 
 /* hazard stripe along the bottom edge of every section. Sections touch, so when one is snapped into place the stripe of
    the section above sits one gap under the header as its top line; the title screen has nothing above it, so it gets its own. */
-:root { --hazard: repeating-linear-gradient(-45deg, var(--accent) 0 16px, var(--bg) 16px 24px); }  /* orange dash length, then dash + gap */
-.hero, .sec { background: var(--hazard) bottom / 100% 4px no-repeat; }
-.hero { background: var(--hazard) top / 100% 4px no-repeat, var(--hazard) bottom / 100% 4px no-repeat; }
+:root { --hazard: repeating-linear-gradient(-45deg, var(--accent) 0 .875rem, var(--bg) .875rem 1.3125rem); }  /* orange dash length, then dash + gap */
+.hero, .sec { background: var(--hazard) bottom / 100% .25rem no-repeat; }
+.hero { background: var(--hazard) top / 100% .25rem no-repeat, var(--hazard) bottom / 100% .25rem no-repeat; }
 
 /* ===== Hero: boot sequence ===== */
 .hero {
@@ -200,7 +201,7 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-block: 4rem;
+  padding-block: 2rem;
   scroll-snap-align: start;
 }
 .boot { margin-bottom: 1.25rem; }
@@ -220,7 +221,7 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
   letter-spacing: .02em;
   margin-bottom: 1.5rem;
 }
-.hero-rest { max-width: 40rem; }
+.hero-rest { max-width: 38rem; }  /* 38 + 2 gap + 26 terminal = main's 66rem inner width, so the terminal sits beside it instead of always wrapping below */
 .hero-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 2rem; }
 
 /* ===== Terminal (script.js): a small console in the hero that drives the page ===== */
@@ -400,8 +401,8 @@ h3 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; }
 
 /* ===== Off-duty log ===== */
 .log h3 + p { color: var(--muted); }
-.log { min-height: 16rem; }  /* = tallest closed card (Armored Core VI: 2-line title), so closed cards match without row stretching */
-#offduty .grid { align-items: start; }  /* an opened image grows only its own card, not the whole row */
+.log { min-height: 20rem; }  /* = tallest closed card in the five-across row (Armored Core VI: 3-line title), so closed cards match without row stretching */
+#offduty .grid { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); align-items: start; }  /* all five in one row on desktop, so the section fits one screen; an opened image grows only its own card, not the whole row */
 .view { width: 100%; margin-top: auto; }  /* "View image" toggle, native <details> */
 .view summary { list-style: none; }
 .view summary::-webkit-details-marker { display: none; }
